@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 
 class RecipeCard extends StatelessWidget {
   final String title;
-
   final String thumbnailUrl;
+  final String cal;
   RecipeCard({
     required this.title,
     required this.thumbnailUrl,
+    required this.cal,
   });
   @override
   Widget build(BuildContext context) {
@@ -68,12 +69,12 @@ class RecipeCard extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.star,
-                        color: Colors.yellow,
+                        Icons.local_fire_department,
+                        color: Colors.orange,
                         size: 18,
                       ),
                       SizedBox(width: 7),
-                      Text('9.1'),
+                      Text('$cal Kcal'),
                     ],
                   ),
                 ),

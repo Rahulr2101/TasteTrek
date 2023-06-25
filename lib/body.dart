@@ -27,11 +27,11 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Icon(Icons.restaurant_menu),
             SizedBox(width: 10),
-            Text('Food Recipes'),
+            Text('Tastetrek'),
           ],
         ),
       ),
@@ -44,7 +44,8 @@ class _HomePageState extends State<HomePage> {
               decoration: InputDecoration(
                 labelText: 'Search Recipes',
                 prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
               ),
               onChanged: (value) {
                 getRecipes(value);
@@ -59,6 +60,7 @@ class _HomePageState extends State<HomePage> {
                   return RecipeCard(
                     title: _recipes[index].name,
                     thumbnailUrl: _recipes[index].image,
+                    cal: _recipes[index].cal,
                   );
                 },
               ),

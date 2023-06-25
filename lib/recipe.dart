@@ -1,12 +1,24 @@
 class Recipe {
   final String name;
   final String image;
+  final String cal;
+  final String yield;
 
-  Recipe({required this.name, required this.image});
+  Recipe(
+      {required this.name,
+      required this.image,
+      required this.cal,
+      required this.yield});
 
   factory Recipe.fromJson(dynamic json) {
+    double calorieValue =
+        json['totalNutrients']['ENERC_KCAL']['quantity'] / json['yield'];
+    String roundedCalorieString = calorieValue.toStringAsFixed(0);
     return Recipe(
-        name: json['label'] as String, image: json['image'] as String);
+        name: json['label'] as String,
+        image: json['image'] as String,
+        cal: roundedCalorieString,
+        yield: json['yeild'].toString());
   }
 
   static List<Recipe> recipeFromSnapshot(List snapshot) {

@@ -9,10 +9,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Food recipe',
+      title: 'Tastetrek',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.purple,
         primaryColor: Colors.white,
         textTheme: TextTheme(
           bodyText2: TextStyle(color: Colors.white),
