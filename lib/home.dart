@@ -1,49 +1,107 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
-class mainScreen extends StatefulWidget {
-  const mainScreen({Key? key}) : super(key: key);
+class RecipeCard extends StatelessWidget {
+  final String title;
 
-  @override
-  State<mainScreen> createState() => _mainScreenState();
-}
-
-class _mainScreenState extends State<mainScreen> {
-  final foodController = TextEditingController();
+  final String thumbnailUrl;
+  RecipeCard({
+    required this.title,
+    required this.thumbnailUrl,
+  });
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(backgroundColor: Color.fromARGB(255, 255, 184, 0)),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(children: [
-            const SizedBox(
-              height: 50,
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+      width: MediaQuery.of(context).size.width,
+      height: 180,
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.6),
+            offset: Offset(
+              0.0,
+              10.0,
             ),
-            TextField(
-              controller: foodController,
-              decoration: InputDecoration(
-                  hintText: 'food',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10))),
-            ),
-            ElevatedButton(onPressed: fetchdata, child: Text('Search'))
-          ]),
+            blurRadius: 10.0,
+            spreadRadius: -6.0,
+          ),
+        ],
+        image: DecorationImage(
+          colorFilter: ColorFilter.mode(
+            Colors.black.withOpacity(0.35),
+            BlendMode.multiply,
+          ),
+          image: NetworkImage(thumbnailUrl),
+          fit: BoxFit.cover,
         ),
       ),
+      child: Stack(
+        children: [
+          Align(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5.0),
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 19,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+              ),
+            ),
+            alignment: Alignment.center,
+          ),
+          Align(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(5),
+                  margin: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.star,
+                        color: Colors.yellow,
+                        size: 18,
+                      ),
+                      SizedBox(width: 7),
+                      Text('9.1'),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(5),
+                  margin: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.schedule,
+                        color: Colors.yellow,
+                        size: 18,
+                      ),
+                      SizedBox(width: 7),
+                      Text('2hr'),
+                    ],
+                  ),
+                )
+              ],
+            ),
+            alignment: Alignment.bottomLeft,
+          ),
+        ],
+      ),
     );
-  }
-
-  void fetchdata() async {
-    print('data');
-    final url =
-        'https://api.edamam.com/search?q=${foodController.text}&app_id=52f1e434&app_key=dfbc1dbae383fc5f5b68ab38f84d24ba';
-    final uri = Uri.parse(url);
-    final response = await http.get(uri);
-    final body = response.body;
-    final json = jsonDecode(body);
-    print(json);
   }
 }

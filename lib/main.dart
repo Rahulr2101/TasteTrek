@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:tastetrek/home.dart';
+import 'package:tastetrek/body.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Builder(
-        builder: (context) {
-          return mainScreen();
-        },
+      title: 'Food recipe',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        primaryColor: Colors.white,
+        textTheme: TextTheme(
+          bodyText2: TextStyle(color: Colors.white),
+        ),
       ),
+      home: HomePage(),
     );
   }
 }

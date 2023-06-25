@@ -1,44 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:tastetrek/home.dart';
+import 'package:tastetrek/recipe.api.dart';
+import 'package:tastetrek/recipe.dart';
 
-class Body extends StatefulWidget {
-  const Body({super.key});
-
+class HomePage extends StatefulWidget {
   @override
-  State<Body> createState() => _BodyState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _BodyState extends State<Body> {
+class _HomePageState extends State<HomePage> {
+  late List<Recipe> _recipes;
+  bool _isLoading = true;
+
   @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
+  void initState() {
+    super.initState();
+
+    getRecipes();
   }
-}
 
-class Card extends StatefulWidget {
-  const Card({super.key});
-
-  @override
-  State<Card> createState() => _CardState();
-}
-
-class MyWidget extends StatelessWidget {
-  const MyWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
+  Future<void> getRecipes() async {
+    _recipes = await RecipeApi.getRecipe();
+    setState(() {
+      _isLoading = false;
+    });
+    print(_recipes);
   }
-}
 
-class _CardState extends State<Card> {
   @override
   Widget build(BuildContext context) {
-    double defaultSize = SizeConfig.defaultSize;
-    return AspectRatio(
-      aspectRatio: 1.65,
-      child: Container(
-        decoration: BoxDecoration(),
-      ),
-    );
+    return Scaffold(
+        appBar: AppBar(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.restaurant_menu),
+              SizedBox(width: 10),
+              Text('Food Recipes'),
+            ],
+          ),
+        ),
+        body: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : ListView.builder(
+                itemCount: _recipes.length,
+                itemBuilder: (context, index) {
+                  return RecipeCard(
+                      title: _recipes[index].name,
+                      thumbnailUrl: _recipes[index].image);
+                },
+              ));
   }
 }
