@@ -1,4 +1,4 @@
-# tastetrek
+# Tastetrek
 
 A new Flutter project.
 
