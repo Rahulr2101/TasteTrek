@@ -94,21 +94,51 @@ class RecipePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(recipe.name),
-      ),
-      body: Container(
-          decoration: BoxDecoration(
-        image: DecorationImage(
-          colorFilter: ColorFilter.mode(
-            Colors.black.withOpacity(0.35),
-            BlendMode.multiply,
-          ),
-          image: NetworkImage(recipe.image),
-          fit: BoxFit.cover,
+        appBar: AppBar(
+          title: Text(recipe.name),
         ),
-      )),
-      // Build the recipe page UI using the recipe object
-    );
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Container(
+              width: double.maxFinite,
+              height: double.maxFinite,
+              child: Stack(
+                children: [
+                  Positioned(
+                      child: Container(
+                    width: double.maxFinite,
+                    height: 300,
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: NetworkImage(recipe.image),
+                            fit: BoxFit.fitWidth)),
+                  )),
+                  Positioned(
+                      top: 250,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 500,
+                        decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(30),
+                                topRight: Radius.circular(30))),
+                      )),
+                  Positioned(
+                      top: 280,
+                      child: Column(
+                        children: [
+                          Container(
+                            child: Text('hello'),
+                          )
+                        ],
+                      ))
+                ],
+              ),
+            ),
+          ),
+        )
+        // Build the recipe page UI using the recipe object
+        );
   }
 }
