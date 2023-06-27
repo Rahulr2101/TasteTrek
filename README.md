@@ -1,16 +1,11 @@
-# tastetrek
+# TasteTrek - Recipe Suggestion App
 
-A new Flutter project.
+TasteTrek is a recipe suggestion app designed to make meal planning easier and healthier. By considering the user's food preferences, TasteTrek recommends a variety of delicious recipes that align with their tastes. Each recipe comes with an approximate calorie content, allowing users to make informed decisions about their meals. With TasteTrek, users can explore a wide range of culinary options while ensuring their nutritional needs are met. Start your flavor-filled journey towards a healthier lifestyle with TasteTrek!
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Key Features
+- Personalized recipe suggestions based on food preferences
+- Approximate calorie information for each recipe
+- Easy-to-use interface for seamless navigation
+- Ability to save favorite recipes for future reference
+- Search functionality to find specific recipes
+- Regular updates with new recipes and features
