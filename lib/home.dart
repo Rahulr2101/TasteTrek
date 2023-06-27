@@ -4,10 +4,12 @@ class RecipeCard extends StatelessWidget {
   final String title;
   final String thumbnailUrl;
   final String cal;
+  final String place;
   RecipeCard({
     required this.title,
     required this.thumbnailUrl,
     required this.cal,
+    required this.place,
   });
   @override
   Widget build(BuildContext context) {
@@ -88,12 +90,12 @@ class RecipeCard extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.schedule,
+                        Icons.location_on,
                         color: Colors.yellow,
                         size: 18,
                       ),
                       SizedBox(width: 7),
-                      Text('2hr'),
+                      Text(place),
                     ],
                   ),
                 )

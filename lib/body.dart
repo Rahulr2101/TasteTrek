@@ -22,6 +22,15 @@ class _HomePageState extends State<HomePage> {
     print(_recipes);
   }
 
+  void navigateToRecipePage(Recipe recipe) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecipePage(recipe: recipe),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,16 +66,49 @@ class _HomePageState extends State<HomePage> {
               child: ListView.builder(
                 itemCount: _recipes.length,
                 itemBuilder: (context, index) {
-                  return RecipeCard(
-                    title: _recipes[index].name,
-                    thumbnailUrl: _recipes[index].image,
-                    cal: _recipes[index].cal,
+                  return GestureDetector(
+                    onTap: () {
+                      navigateToRecipePage(_recipes[index]);
+                    },
+                    child: RecipeCard(
+                      title: _recipes[index].name,
+                      thumbnailUrl: _recipes[index].image,
+                      cal: _recipes[index].cal,
+                      place: _recipes[index].place,
+                    ),
                   );
                 },
               ),
             ),
         ],
       ),
+    );
+  }
+}
+
+class RecipePage extends StatelessWidget {
+  final Recipe recipe;
+
+  RecipePage({required this.recipe});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(recipe.name),
+      ),
+      body: Container(
+          decoration: BoxDecoration(
+        image: DecorationImage(
+          colorFilter: ColorFilter.mode(
+            Colors.black.withOpacity(0.35),
+            BlendMode.multiply,
+          ),
+          image: NetworkImage(recipe.image),
+          fit: BoxFit.cover,
+        ),
+      )),
+      // Build the recipe page UI using the recipe object
     );
   }
 }
