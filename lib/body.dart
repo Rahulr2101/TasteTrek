@@ -96,54 +96,79 @@ class RecipePage extends StatelessWidget {
   Widget build(BuildContext context) {
     print(recipe.ingredient);
     return Scaffold(
-        appBar: AppBar(
-          title: Text(recipe.name),
-        ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Container(
-              width: double.maxFinite,
-              height: double.maxFinite,
-              child: Stack(
-                children: [
-                  Positioned(
-                      child: Container(
+      appBar: AppBar(
+        title: Text(recipe.name),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Container(
+            width: double.maxFinite,
+            height: double.maxFinite,
+            child: Stack(
+              children: [
+                Positioned(
+                  child: Container(
                     width: double.maxFinite,
                     height: 300,
                     decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: NetworkImage(recipe.image),
-                            fit: BoxFit.fitWidth)),
-                  )),
-                  Positioned(
-                      top: 250,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 500,
-                        decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                topRight: Radius.circular(30))),
-                      )),
-                  Positioned(
-                      top: 280,
+                      image: DecorationImage(
+                        colorFilter: ColorFilter.mode(
+                          Colors.black.withOpacity(0.35),
+                          BlendMode.multiply,
+                        ),
+                        image: NetworkImage(recipe.image),
+                        fit: BoxFit.fitWidth,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 250,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 500,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 280,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    child: Align(
+                      alignment: Alignment.center,
                       child: Column(
                         children: [
-                          Container(
-                            child: Text('Ingredients'),
+                          Text(
+                            'Ingredients',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                          Container(
-                            child: Text(recipe.ingredient),
-                          )
+                          SizedBox(height: 10),
+                          Text(
+                            recipe.ingredient,
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 0, 0, 0),
+                            ),
+                          ),
                         ],
-                      ))
-                ],
-              ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        )
-        // Build the recipe page UI using the recipe object
-        );
+        ),
+      ),
+    );
   }
 }
