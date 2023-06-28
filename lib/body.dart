@@ -75,6 +75,7 @@ class _HomePageState extends State<HomePage> {
                       thumbnailUrl: _recipes[index].image,
                       cal: _recipes[index].cal,
                       place: _recipes[index].place,
+                      ingredients: _recipes[index].ingredient,
                     ),
                   );
                 },
@@ -93,6 +94,7 @@ class RecipePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(recipe.ingredient);
     return Scaffold(
         appBar: AppBar(
           title: Text(recipe.name),
@@ -129,7 +131,10 @@ class RecipePage extends StatelessWidget {
                       child: Column(
                         children: [
                           Container(
-                            child: Text('hello'),
+                            child: Text('Ingredients'),
+                          ),
+                          Container(
+                            child: Text(recipe.ingredient),
                           )
                         ],
                       ))
