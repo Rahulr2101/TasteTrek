@@ -4,7 +4,7 @@ class Recipe {
   final String cal;
   final String yield;
   final String place;
-  final String ingredient;
+  final List<dynamic> ingredient;
 
   Recipe({
     required this.name,
@@ -19,11 +19,11 @@ class Recipe {
     double calorieValue =
         json['totalNutrients']['ENERC_KCAL']['quantity'] / json['yield'];
     String roundedCalorieString = calorieValue.toStringAsFixed(0);
-    String allIngredients = '';
 
-    for (String ingredientLine in json['ingredientLines']) {
-      allIngredients += '- $ingredientLine\n';
-    }
+    List<dynamic> ingredientsJson = json['ingredients'];
+    List<String> ingredients = ingredientsJson.map((ingredientJson) {
+      return ingredientJson['text'] as String;
+    }).toList();
 
     return Recipe(
       name: json['label'] as String,
@@ -31,7 +31,7 @@ class Recipe {
       cal: roundedCalorieString,
       yield: json['yield'].toString(),
       place: json['cuisineType'][0],
-      ingredient: allIngredients,
+      ingredient: ingredients,
     );
   }
 

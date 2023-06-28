@@ -14,7 +14,7 @@ class _HomePageState extends State<HomePage> {
   bool _isLoading = true;
 
   @override
-  Future<void> getRecipes(String searchText) async {
+  Future<void> getRecipes(searchText) async {
     _recipes = await RecipeApi.getRecipe(searchText);
     setState(() {
       _isLoading = false;
@@ -169,11 +169,28 @@ class RecipePage extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 10),
-                          Text(
-                            recipe.ingredient,
-                            style: TextStyle(
-                              color: Color.fromARGB(255, 0, 0, 0),
-                            ),
+                          // Text(
+                          //   recipe.ingredient,
+                          //   style: TextStyle(
+                          //     color: Color.fromARGB(255, 0, 0, 0),
+                          //   ),
+                          // ),
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: recipe.ingredient.length,
+                            itemBuilder: (context, index) {
+                              return Card(
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    recipe.ingredient[index],
+                                    style: TextStyle(
+                                      color: Color.fromARGB(255, 0, 0, 0),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
