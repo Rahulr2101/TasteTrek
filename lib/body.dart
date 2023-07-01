@@ -176,37 +176,40 @@ class RecipePage extends StatelessWidget {
                           //     color: Color.fromARGB(255, 0, 0, 0),
                           //   ),
                           // ),
-                          ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: recipe.ingredient.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.bottomLeft,
-                                      child: Image.network(
-                                        recipe.ingimage[
-                                            index], // Image URL for ingredient
-                                        width: 40,
-                                        height: 40,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        recipe.ingredient[index],
-                                        style: TextStyle(
-                                          color: Color.fromARGB(255, 0, 0, 0),
+                          Container(
+                            child: ListView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: recipe.ingredient.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.bottomLeft,
+                                        child: Image.network(
+                                          recipe.ingimage[
+                                              index], // Image URL for ingredient
+                                          width: 40,
+                                          height: 40,
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          recipe.ingredient[index],
+                                          style: TextStyle(
+                                            color: Color.fromARGB(255, 0, 0, 0),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ],
                       ),
