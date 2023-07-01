@@ -6,14 +6,15 @@ class RecipeCard extends StatelessWidget {
   final String cal;
   final String place;
   final List<dynamic> ingredients;
+  final List<dynamic> ingimage;
 
-  RecipeCard({
-    required this.title,
-    required this.thumbnailUrl,
-    required this.cal,
-    required this.place,
-    required this.ingredients,
-  });
+  RecipeCard(
+      {required this.title,
+      required this.thumbnailUrl,
+      required this.cal,
+      required this.place,
+      required this.ingredients,
+      required this.ingimage});
   @override
   Widget build(BuildContext context) {
     return Container(

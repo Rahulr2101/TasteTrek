@@ -76,6 +76,7 @@ class _HomePageState extends State<HomePage> {
                       cal: _recipes[index].cal,
                       place: _recipes[index].place,
                       ingredients: _recipes[index].ingredient,
+                      ingimage: _recipes[index].ingimage,
                     ),
                   );
                 },
@@ -179,15 +180,30 @@ class RecipePage extends StatelessWidget {
                             shrinkWrap: true,
                             itemCount: recipe.ingredient.length,
                             itemBuilder: (context, index) {
-                              return Card(
-                                child: Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text(
-                                    recipe.ingredient[index],
-                                    style: TextStyle(
-                                      color: Color.fromARGB(255, 0, 0, 0),
+                              return Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.bottomLeft,
+                                      child: Image.network(
+                                        recipe.ingimage[
+                                            index], // Image URL for ingredient
+                                        width: 40,
+                                        height: 40,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
-                                  ),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        recipe.ingredient[index],
+                                        style: TextStyle(
+                                          color: Color.fromARGB(255, 0, 0, 0),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               );
                             },
