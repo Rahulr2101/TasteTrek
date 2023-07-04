@@ -16,7 +16,6 @@ class _HomePageState extends State<HomePage> {
   final controllersearch = TextEditingController();
   late List<Recipe> _recipes;
   bool _isLoading = true;
-  int currentPageIndex = 0;
 
   @override
   Future<void> getRecipes(searchText) async {
@@ -92,28 +91,6 @@ class _HomePageState extends State<HomePage> {
               ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: 'Explore',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark_outline),
-            label: 'Bookmark',
-          ),
-        ],
-        currentIndex: currentPageIndex,
-        onTap: (int index) {
-          setState(() {
-            currentPageIndex = index;
-          });
-        },
       ),
     );
   }
