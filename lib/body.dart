@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tastetrek/bookmark.dart';
 import 'package:tastetrek/recipe.dart';
 import 'package:tastetrek/recipepg.dart';
+import 'package:tastetrek/explore.dart';
 
 class body extends StatefulWidget {
   const body({super.key});
@@ -11,7 +12,7 @@ class body extends StatefulWidget {
 }
 
 class _bodyState extends State<body> {
-  List page = [HomePage(), Fav()];
+  List page = [HomePage(), Exp(), Fav()];
 
   int currentPageIndex = 0;
   void onTap(int index) {
