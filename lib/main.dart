@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
       title: 'Tastetrek',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.purple,
+        primarySwatch: Colors.deepPurple,
         primaryColor: Colors.white,
         textTheme: TextTheme(
           bodyText2: TextStyle(color: Colors.white),

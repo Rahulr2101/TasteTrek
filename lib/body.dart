@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:tastetrek/home.dart';
 import 'package:tastetrek/recipe.api.dart';
 import 'package:tastetrek/recipe.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,6 +16,7 @@ class _HomePageState extends State<HomePage> {
   final controllersearch = TextEditingController();
   late List<Recipe> _recipes;
   bool _isLoading = true;
+  int currentPageIndex = 0;
 
   @override
   Future<void> getRecipes(searchText) async {
@@ -44,45 +49,71 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: controllersearch,
-              decoration: InputDecoration(
-                labelText: 'Search Recipes',
-                prefixIcon: Icon(Icons.search),
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-              ),
-              onChanged: (value) {
-                getRecipes(value);
-              },
-            ),
-          ),
-          if (_isLoading == false)
-            Expanded(
-              child: ListView.builder(
-                itemCount: _recipes.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      navigateToRecipePage(_recipes[index]);
-                    },
-                    child: RecipeCard(
-                      title: _recipes[index].name,
-                      thumbnailUrl: _recipes[index].image,
-                      cal: _recipes[index].cal,
-                      place: _recipes[index].place,
-                      ingredients: _recipes[index].ingredient,
-                      ingimage: _recipes[index].ingimage,
-                    ),
-                  );
+      body: Container(
+        alignment: Alignment.bottomCenter,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: controllersearch,
+                decoration: InputDecoration(
+                  labelText: 'Search Recipes',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                onChanged: (value) {
+                  getRecipes(value);
                 },
               ),
             ),
+            if (_isLoading == false)
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _recipes.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        navigateToRecipePage(_recipes[index]);
+                      },
+                      child: RecipeCard(
+                        title: _recipes[index].name,
+                        thumbnailUrl: _recipes[index].image,
+                        cal: _recipes[index].cal,
+                        place: _recipes[index].place,
+                        ingredients: _recipes[index].ingredient,
+                        ingimage: _recipes[index].ingimage,
+                      ),
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.explore),
+            label: 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark_outline),
+            label: 'Bookmark',
+          ),
         ],
+        currentIndex: currentPageIndex,
+        onTap: (int index) {
+          setState(() {
+            currentPageIndex = index;
+          });
+        },
       ),
     );
   }
@@ -92,6 +123,20 @@ class RecipePage extends StatelessWidget {
   final Recipe recipe;
 
   RecipePage({required this.recipe});
+
+  void toggleFavorite(Recipe recipe) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> favorites = prefs.getStringList('favorites') ?? [];
+    String itemJson = json.encode(recipe.toJson());
+    bool isFavorite = favorites.contains(itemJson);
+    if (isFavorite) {
+      favorites.remove(itemJson);
+    } else {
+      favorites.add(itemJson);
+    }
+    await prefs.setStringList('favorites', favorites);
+    print(favorites);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,14 +195,16 @@ class RecipePage extends StatelessWidget {
                             height: 10,
                           ),
                           Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                recipe.name,
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold),
-                              )),
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              recipe.name,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                           SizedBox(
                             height: 40,
                           ),
@@ -170,12 +217,6 @@ class RecipePage extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 10),
-                          // Text(
-                          //   recipe.ingredient,
-                          //   style: TextStyle(
-                          //     color: Color.fromARGB(255, 0, 0, 0),
-                          //   ),
-                          // ),
                           Container(
                             child: ListView.builder(
                               physics: NeverScrollableScrollPhysics(),
@@ -205,6 +246,12 @@ class RecipePage extends StatelessWidget {
                                           ),
                                         ),
                                       ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          toggleFavorite(recipe);
+                                        },
+                                        child: Text('save'),
+                                      )
                                     ],
                                   ),
                                 );

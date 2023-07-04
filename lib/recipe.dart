@@ -7,14 +7,27 @@ class Recipe {
   final List<dynamic> ingredient;
   final List<dynamic> ingimage;
 
-  Recipe(
-      {required this.name,
-      required this.image,
-      required this.cal,
-      required this.yield,
-      required this.place,
-      required this.ingredient,
-      required this.ingimage});
+  Recipe({
+    required this.name,
+    required this.image,
+    required this.cal,
+    required this.yield,
+    required this.place,
+    required this.ingredient,
+    required this.ingimage,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'image': image,
+      'cal': cal,
+      'yield': yield,
+      'place': place,
+      'ingredient': ingredient,
+      'ingimage': ingimage,
+    };
+  }
 
   factory Recipe.fromJson(dynamic json) {
     double calorieValue =
@@ -33,16 +46,17 @@ class Recipe {
     }).toList();
 
     return Recipe(
-        name: json['label'] as String,
-        image: json['image'] as String,
-        cal: roundedCalorieString,
-        yield: json['yield'].toString(),
-        place: json['cuisineType'][0],
-        ingredient: ingredients,
-        ingimage: imgUrls);
+      name: json['label'] as String,
+      image: json['image'] as String,
+      cal: roundedCalorieString,
+      yield: json['yield'].toString(),
+      place: json['cuisineType'][0],
+      ingredient: ingredients,
+      ingimage: imgUrls,
+    );
   }
 
-  static List<Recipe> recipeFromSnapshot(List snapshot) {
+  static List<Recipe> recipeFromSnapshot(List<dynamic> snapshot) {
     return snapshot.map((data) {
       return Recipe.fromJson(data);
     }).toList();
