@@ -113,6 +113,27 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             currentPageIndex = index;
           });
+          if (index == 0) {
+            void navigateToRecipePage(Recipe recipe) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RecipePage(recipe: recipe),
+                ),
+              );
+            }
+          } else if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Exp()),
+            );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Fav(currentPageIndex: index)),
+            );
+          }
         },
       ),
     );
@@ -269,5 +290,14 @@ class RecipePage extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class Exp extends StatelessWidget {
+  const Exp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }
