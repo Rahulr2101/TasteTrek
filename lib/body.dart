@@ -13,11 +13,20 @@ class body extends StatefulWidget {
 class _bodyState extends State<body> {
   List page = [HomePage(), Fav()];
 
+  int currentPageIndex = 0;
+  void onTap(int index) {
+    setState(() {
+      currentPageIndex = index;
+      print(currentPageIndex);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: page[0],
+        body: page[currentPageIndex],
         bottomNavigationBar: BottomNavigationBar(
+          onTap: onTap,
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
@@ -32,6 +41,7 @@ class _bodyState extends State<body> {
               label: 'Bookmark',
             ),
           ],
+          currentIndex: currentPageIndex,
         ));
   }
 }
