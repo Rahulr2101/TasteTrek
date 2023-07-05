@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
-
+import 'package:tastetrek/share.dart';
 import 'package:flutter/material.dart';
 import 'package:tastetrek/home.dart';
 import 'package:tastetrek/recipe.api.dart';
@@ -91,19 +91,19 @@ class RecipePage extends StatelessWidget {
 
   RecipePage({required this.recipe});
 
-  void toggleFavorite(Recipe recipe) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> favorites = prefs.getStringList('favorites') ?? [];
-    String itemJson = json.encode(recipe.toJson());
-    bool isFavorite = favorites.contains(itemJson);
-    if (isFavorite) {
-      favorites.remove(itemJson);
-    } else {
-      favorites.add(itemJson);
-    }
-    await prefs.setStringList('favorites', favorites);
-    print(favorites);
-  }
+  // void toggleFavorite(Recipe recipe) async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   List<String> favorites = prefs.getStringList('favorites') ?? [];
+  //   String itemJson = json.encode(recipe.toJson());
+  //   bool isFavorite = favorites.contains(itemJson);
+  //   if (isFavorite) {
+  //     favorites.remove(itemJson);
+  //   } else {
+  //     favorites.add(itemJson);
+  //   }
+  //   await prefs.setStringList('favorites', favorites);
+  //   print(favorites);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +215,7 @@ class RecipePage extends StatelessWidget {
                                       ),
                                       ElevatedButton(
                                         onPressed: () {
-                                          toggleFavorite(recipe);
+                                          Store.setBookmark(recipe);
                                         },
                                         child: Text('save'),
                                       )

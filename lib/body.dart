@@ -12,7 +12,7 @@ class body extends StatefulWidget {
 }
 
 class _bodyState extends State<body> {
-  List page = [HomePage(), Exp(), Fav()];
+  List page = [HomePage(), Exp(), FavoritesPage()];
 
   int currentPageIndex = 0;
   void onTap(int index) {
