@@ -21,7 +21,6 @@ class Store {
     }
 
     await _preferences.setStringList('bookmark', favorites);
-    print(favorites);
   }
 
   static List<String>? getBook() => _preferences.getStringList('bookmark');

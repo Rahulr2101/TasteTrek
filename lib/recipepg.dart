@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:tastetrek/share.dart';
 import 'package:flutter/material.dart';
-import 'package:tastetrek/home.dart';
-import 'package:tastetrek/recipe.api.dart';
-import 'package:tastetrek/recipe.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'body.dart';
+import 'home.dart';
+import 'recipe.dart';
+import 'recipe.api.dart';
+import 'share.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -86,31 +89,89 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class RecipePage extends StatelessWidget {
+class RecipePage extends StatefulWidget {
   final Recipe recipe;
 
   RecipePage({required this.recipe});
 
-  // void toggleFavorite(Recipe recipe) async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   List<String> favorites = prefs.getStringList('favorites') ?? [];
-  //   String itemJson = json.encode(recipe.toJson());
-  //   bool isFavorite = favorites.contains(itemJson);
-  //   if (isFavorite) {
-  //     favorites.remove(itemJson);
-  //   } else {
-  //     favorites.add(itemJson);
-  //   }
-  //   await prefs.setStringList('favorites', favorites);
-  //   print(favorites);
-  // }
+  @override
+  _RecipePageState createState() => _RecipePageState();
+}
+
+class _RecipePageState extends State<RecipePage> {
+  dynamic decodedResponse;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    final url = Uri.parse(
+        'https://generativelanguage.googleapis.com/v1beta2/models/chat-bison-001:generateMessage?key=AIzaSyALPProtKMsFmPpcDXRbs8EZvjEUssPQbw');
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({
+      "prompt": {
+        "examples": [
+          {
+            "input": {
+              "content": "How to make chicken curry only instructions to make."
+            },
+            "output": {
+              "content":
+                  "Instruction,1. boil water\n2. cook chicken\n3. fry chicken in oil till it becomes brown"
+            }
+          }
+        ],
+        "messages": [
+          {
+            "content":
+                "How to ${widget.recipe.name} give only instructions to make don't give ingredients"
+          }
+        ]
+      },
+      "temperature": 1,
+    });
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      if (response.statusCode == 200) {
+        decodedResponse = json.decode(response.body);
+        print(decodedResponse);
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  void toggleFavorite(Recipe recipe) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> favorites = prefs.getStringList('favorites') ?? [];
+    String itemJson = json.encode(recipe.toJson());
+    bool isFavorite = favorites.contains(itemJson);
+    if (isFavorite) {
+      favorites.remove(itemJson);
+    } else {
+      favorites.add(itemJson);
+    }
+    await prefs.setStringList('favorites', favorites);
+    print(favorites);
+  }
 
   @override
   Widget build(BuildContext context) {
-    print(recipe.ingredient);
+    print(widget.recipe.ingredient);
     return Scaffold(
       appBar: AppBar(
-        title: Text(recipe.name),
+        title: Text(widget.recipe.name),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -130,7 +191,7 @@ class RecipePage extends StatelessWidget {
                           Colors.black.withOpacity(0.35),
                           BlendMode.multiply,
                         ),
-                        image: NetworkImage(recipe.image),
+                        image: NetworkImage(widget.recipe.image),
                         fit: BoxFit.fitWidth,
                       ),
                     ),
@@ -155,7 +216,6 @@ class RecipePage extends StatelessWidget {
                   child: Container(
                     width: MediaQuery.of(context).size.width,
                     child: Align(
-                      // alignment: Alignment.center,
                       child: Column(
                         children: [
                           SizedBox(
@@ -164,7 +224,7 @@ class RecipePage extends StatelessWidget {
                           Align(
                             alignment: Alignment.topLeft,
                             child: Text(
-                              recipe.name,
+                              widget.recipe.name,
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 20,
@@ -188,7 +248,7 @@ class RecipePage extends StatelessWidget {
                             child: ListView.builder(
                               physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: recipe.ingredient.length,
+                              itemCount: widget.recipe.ingredient.length,
                               itemBuilder: (context, index) {
                                 return Padding(
                                   padding: EdgeInsets.all(8.0),
@@ -197,8 +257,8 @@ class RecipePage extends StatelessWidget {
                                       Align(
                                         alignment: Alignment.bottomLeft,
                                         child: Image.network(
-                                          recipe.ingimage[
-                                              index], // Image URL for ingredient
+                                          widget.recipe.ingimage[index] ??
+                                              'https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061131_1280.png',
                                           width: 40,
                                           height: 40,
                                           fit: BoxFit.cover,
@@ -207,24 +267,64 @@ class RecipePage extends StatelessWidget {
                                       SizedBox(width: 10),
                                       Expanded(
                                         child: Text(
-                                          recipe.ingredient[index],
+                                          widget.recipe.ingredient[index],
                                           style: TextStyle(
                                             color: Color.fromARGB(255, 0, 0, 0),
                                           ),
                                         ),
                                       ),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Store.setBookmark(recipe);
-                                        },
-                                        child: Text('save'),
-                                      )
+                                      // ElevatedButton(
+                                      //   onPressed: () {
+                                      //     toggleFavorite(widget.recipe);
+                                      //   },
+                                      //   child: Text('Save'),
+                                      // )
                                     ],
                                   ),
                                 );
                               },
                             ),
                           ),
+                          // Displaying the decodedResponse or loading indicator
+                          _isLoading
+                              ? CircularProgressIndicator()
+                              : decodedResponse != null &&
+                                      decodedResponse['candidates'] != null
+                                  ? Container(
+                                      padding: EdgeInsets.all(16.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Instructions',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8.0),
+                                          Text(
+                                            decodedResponse['candidates'][0]
+                                                ['content'],
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : Container(
+                                      padding: EdgeInsets.all(16.0),
+                                      child: Text(
+                                        'No instructions available',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
                         ],
                       ),
                     ),
@@ -235,6 +335,23 @@ class RecipePage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Recipe App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: HomePage(),
     );
   }
 }

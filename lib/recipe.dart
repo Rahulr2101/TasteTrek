@@ -34,11 +34,17 @@ class Recipe {
         json['totalNutrients']['ENERC_KCAL']['quantity'] / json['yield'];
     String roundedCalorieString = calorieValue.toStringAsFixed(0);
 
-    List<Map<String, dynamic>> img =
+    List<Map<String, dynamic>>? img =
         List<Map<String, dynamic>>.from(json['ingredients']);
-    List<String> imgUrls = img.map((img) {
-      return img['image'] as String;
-    }).toList();
+    List<String> imgUrls = img?.map((img) {
+          if (img != null && img.containsKey('image') && img['image'] != null) {
+            return img['image'].toString();
+          } else {
+            return 'https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061131_1280.png';
+          }
+        }).toList() ??
+        [];
+    [];
 
     List<dynamic> ingredientsJson = json['ingredients'];
     List<String> ingredients = ingredientsJson.map((ingredientJson) {
@@ -50,7 +56,7 @@ class Recipe {
       image: json['image'] as String,
       cal: roundedCalorieString,
       yield: json['yield'].toString(),
-      place: json['cuisineType'][0],
+      place: json['cuisineType'][0] as String,
       ingredient: ingredients,
       ingimage: imgUrls,
     );
