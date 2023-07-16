@@ -170,172 +170,207 @@ class _RecipePageState extends State<RecipePage> {
   Widget build(BuildContext context) {
     print(widget.recipe.ingredient);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.recipe.name),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            decoration: BoxDecoration(color: Colors.white),
-            width: double.maxFinite,
-            height: double.maxFinite,
-            child: Stack(
-              children: [
-                Positioned(
-                  child: Container(
-                    width: double.maxFinite,
-                    height: 300,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        colorFilter: ColorFilter.mode(
-                          Colors.black.withOpacity(0.35),
-                          BlendMode.multiply,
-                        ),
-                        image: NetworkImage(widget.recipe.image),
-                        fit: BoxFit.fitWidth,
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 250,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 500,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30),
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 280,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    child: Align(
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Align(
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              widget.recipe.name,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+        appBar: AppBar(
+          title: Text(widget.recipe.name),
+        ),
+        body: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : decodedResponse != null && decodedResponse['candidates'] != null
+                ? SafeArea(
+                    child: SingleChildScrollView(
+                      child: Container(
+                        decoration: BoxDecoration(color: Colors.white),
+                        width: double.maxFinite,
+                        height: double.maxFinite,
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              child: Container(
+                                width: double.maxFinite,
+                                height: 300,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    colorFilter: ColorFilter.mode(
+                                      Colors.black.withOpacity(0.35),
+                                      BlendMode.multiply,
+                                    ),
+                                    image: NetworkImage(widget.recipe.image),
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 40,
-                          ),
-                          Text(
-                            'Ingredients',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Container(
-                            child: ListView.builder(
-                              physics: NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: widget.recipe.ingredient.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Row(
-                                    children: [
-                                      Align(
-                                        alignment: Alignment.bottomLeft,
-                                        child: Image.network(
-                                          widget.recipe.ingimage[index] ??
-                                              'https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061131_1280.png',
-                                          width: 40,
-                                          height: 40,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Expanded(
-                                        child: Text(
-                                          widget.recipe.ingredient[index],
-                                          style: TextStyle(
-                                            color: Color.fromARGB(255, 0, 0, 0),
-                                          ),
-                                        ),
-                                      ),
-                                      // ElevatedButton(
-                                      //   onPressed: () {
-                                      //     toggleFavorite(widget.recipe);
-                                      //   },
-                                      //   child: Text('Save'),
-                                      // )
-                                    ],
+                            Positioned(
+                              top: 250,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                height: 500,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(30),
+                                    topRight: Radius.circular(30),
                                   ),
-                                );
-                              },
+                                ),
+                              ),
                             ),
-                          ),
-                          // Displaying the decodedResponse or loading indicator
-                          _isLoading
-                              ? CircularProgressIndicator()
-                              : decodedResponse != null &&
-                                      decodedResponse['candidates'] != null
-                                  ? Container(
-                                      padding: EdgeInsets.all(16.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Instructions',
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          SizedBox(height: 8.0),
-                                          Text(
-                                            decodedResponse['candidates'][0]
-                                                ['content'],
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ],
+                            Positioned(
+                              top: 280,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: Align(
+                                  child: Column(
+                                    children: [
+                                      const SizedBox(
+                                        height: 10,
                                       ),
-                                    )
-                                  : Container(
-                                      padding: EdgeInsets.all(16.0),
-                                      child: Text(
-                                        'No instructions available',
+                                      Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              20, 0, 20, 0),
+                                          child: Row(children: [
+                                            Text(
+                                              widget.recipe.name,
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Expanded(
+                                                child: Container(
+                                              alignment: Alignment.bottomRight,
+                                              child: Icon(Icons
+                                                  .bookmark_border_outlined),
+                                            ))
+                                          ]),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 40,
+                                      ),
+                                      Text(
+                                        'Ingredients',
                                         style: TextStyle(
                                           color: Colors.black,
-                                          fontSize: 16,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                    ),
-                        ],
+                                      const SizedBox(height: 10),
+                                      Container(
+                                        child: ListView.builder(
+                                          physics:
+                                              NeverScrollableScrollPhysics(),
+                                          shrinkWrap: true,
+                                          itemCount:
+                                              widget.recipe.ingredient.length,
+                                          itemBuilder: (context, index) {
+                                            return Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Row(
+                                                children: [
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.bottomLeft,
+                                                    child: Image.network(
+                                                      widget.recipe.ingimage[
+                                                              index] ??
+                                                          'https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061131_1280.png',
+                                                      width: 40,
+                                                      height: 40,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  Expanded(
+                                                    child: Text(
+                                                      widget.recipe
+                                                          .ingredient[index],
+                                                      style: TextStyle(
+                                                        color: Color.fromARGB(
+                                                            255, 0, 0, 0),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // ElevatedButton(
+                                                  //   onPressed: () {
+                                                  //     toggleFavorite(widget.recipe);
+                                                  //   },
+                                                  //   child: Text('Save'),
+                                                  // )
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      // Displaying the decodedResponse or loading indicator
+                                      _isLoading
+                                          ? CircularProgressIndicator()
+                                          : decodedResponse != null &&
+                                                  decodedResponse[
+                                                          'candidates'] !=
+                                                      null
+                                              ? Container(
+                                                  padding: EdgeInsets.all(16.0),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'Instructions',
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 20,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 8.0),
+                                                      Text(
+                                                        decodedResponse[
+                                                                'candidates'][0]
+                                                            ['content'],
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              : Container(
+                                                  padding: EdgeInsets.all(16.0),
+                                                  child: Text(
+                                                    'No instructions available',
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+                  )
+                : Center(
+                    child: Text(
+                      'No instructions available',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ));
   }
 }
 
