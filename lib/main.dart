@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.deepPurple,
         primaryColor: Colors.white,
         textTheme: TextTheme(
-          bodyText2: TextStyle(color: Colors.white),
+          bodyMedium: TextStyle(color: Colors.white),
         ),
       ),
       home: body(),
