@@ -239,10 +239,15 @@ class _RecipePageState extends State<RecipePage> {
                                               ),
                                             ),
                                             Expanded(
-                                                child: Container(
-                                              alignment: Alignment.bottomRight,
-                                              child: Icon(Icons
-                                                  .bookmark_border_outlined),
+                                                child: GestureDetector(
+                                              onTap: () =>
+                                                  toggleFavorite(widget.recipe),
+                                              child: Container(
+                                                alignment:
+                                                    Alignment.bottomRight,
+                                                child: Icon(Icons
+                                                    .bookmark_border_outlined),
+                                              ),
                                             ))
                                           ]),
                                         ),
