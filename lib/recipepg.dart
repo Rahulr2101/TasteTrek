@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,15 +34,24 @@ class _HomePageState extends State<HomePage> {
     print(_recipes);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchtreading();
+  // Future<void> fetchData() async {
+  //   await fetchtreading();
+  //   rawImageUrl = await fetchImages(); // Wait for fetchImages to complete
+  // }
+
+  Future<void> fetchDataFromApis() async {
+    try {
+      await fetchtreading();
+
+      rawImageUrl = await fetchImages();
+    } catch (e) {
+      print('Error fetching data from APIs: $e');
+    }
   }
 
   Future<void> fetchtreading() async {
     final url = Uri.parse(
-        'https://generativelanguage.googleapis.com/v1beta2/models/chat-bison-001:generateMessage?key=');
+        'https://generativelanguage.googleapis.com/v1beta2/models/chat-bison-001:generateMessage?key=AIzaSyALPProtKMsFmPpcDXRbs8EZvjEUssPQbw');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       "prompt": {
@@ -78,11 +89,7 @@ class _HomePageState extends State<HomePage> {
         Match? match = regExp.firstMatch(content);
         if (match != null) {
           String jsonArrayString = match.group(1)!;
-
-          // Convert the JSON array string to a Dart List
           dishNames = json.decode(jsonArrayString);
-
-          // Print the list of dish names
           print(dishNames);
         } else {
           print("JSON array not found in the content.");
@@ -93,18 +100,36 @@ class _HomePageState extends State<HomePage> {
     } catch (error) {
       print('Error: $error');
     }
-    final apiKey = 'gEveQ1Hcp6c9LRQ_XZAlBSEsQvYzqd5aZ5vcDWcEaPk';
+  }
+
+  Future<List<String>> fetchImages() async {
+    final apiKey = '';
+    List<String> imageUrlList = [];
+
     for (int i = 0; i < dishNames.length; i++) {
-      final queryParameters = {'query': dishNames[i]};
+      final queryParameters = {
+        'query': dishNames[i],
+        'fit': 'crop',
+        'w': '640', // Width in pixels (360p width)
+        'h': '360', // Height in pixels (360p height)
+      };
       final uri =
           Uri.https('api.unsplash.com', '/search/photos', queryParameters);
       final respon =
           await http.get(uri, headers: {'Authorization': 'Client-ID $apiKey'});
-      Map<String, dynamic> jsonData = json.decode(respon.body);
-      List<dynamic> results = jsonData['results'];
-      rawImageUrl.add(results[0]['urls']['raw']);
+      if (respon.statusCode == 200) {
+        Map<String, dynamic> jsonData = json.decode(respon.body);
+        List<dynamic> results = jsonData['results'];
+        if (results.isNotEmpty) {
+          imageUrlList.add(results[0]['urls']['raw']);
+        }
+      } else {
+        // Handle the error when the API request fails
+        print('Error: ${respon.statusCode}');
+      }
     }
-    print(rawImageUrl);
+
+    return imageUrlList;
   }
 
   void navigateToRecipePage(Recipe recipe) {
@@ -115,6 +140,12 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  static final customCacheManager = CacheManager(Config(
+    'customCacheKey',
+    stalePeriod: const Duration(days: 15),
+    maxNrOfCacheObjects: 100,
+  ));
 
   @override
   Widget build(BuildContext context) {
@@ -189,42 +220,35 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.black),
                     ),
                   ),
-                  SizedBox(
-                      height: 210,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.all(10),
-                        itemCount: dishNames.length,
-                        separatorBuilder: (context, index) {
-                          return const SizedBox(width: 12);
-                        },
-                        itemBuilder: (context, index) {
-                          return buildCard(index, dishNames, rawImageUrl);
-                        },
-                      ))
+                  FutureBuilder<void>(
+                    future: fetchDataFromApis(),
+                    builder: (context, snapshot) {
+                      // Images are loaded successfully
+                      return SizedBox(
+                        height: 210,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.all(10),
+                          itemCount: dishNames.length,
+                          separatorBuilder: (context, index) {
+                            return const SizedBox(width: 12);
+                          },
+                          itemBuilder: (context, index) => CachedNetworkImage(
+                              key: UniqueKey(),
+                              cacheManager: customCacheManager,
+                              imageUrl: rawImageUrl[index],
+                              height: 250,
+                              width: 300,
+                              fit: BoxFit.cover),
+                        ),
+                      );
+                    },
+                  )
                 ]),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget buildCard(
-      int index, List<dynamic> dishNames, List<String> rawImageUrl) {
-    return Container(
-      width: 300,
-      height: 250,
-      decoration: BoxDecoration(
-          image: DecorationImage(
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.35),
-                BlendMode.multiply,
-              ),
-              image: NetworkImage(
-                rawImageUrl[index],
-              ))),
     );
   }
 }
