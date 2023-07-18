@@ -45,20 +45,35 @@ class _HomePageState extends State<HomePage> {
         alignment: Alignment.bottomCenter,
         child: Column(
           children: [
+            Container(
+              padding: EdgeInsets.fromLTRB(10, 20, 0, 25),
+              alignment: Alignment.bottomLeft,
+              child: Text(
+                "Find best recipes \nfor cooking",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 25),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: controllersearch,
-                decoration: InputDecoration(
-                  labelText: 'Search Recipes',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
+              child: SizedBox(
+                width: 350,
+                height: 50,
+                child: TextField(
+                  controller: controllersearch,
+                  decoration: InputDecoration(
+                    labelText: 'Search Recipes',
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
+                  onChanged: (value) {
+                    getRecipes(value);
+                  },
                 ),
-                onChanged: (value) {
-                  getRecipes(value);
-                },
               ),
             ),
             if (_isLoading == false)

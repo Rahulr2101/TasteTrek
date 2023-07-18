@@ -25,17 +25,17 @@ class _bodyState extends State<body> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Icon(Icons.restaurant_menu),
-              SizedBox(width: 10),
-              Text('Tastetrek'),
-            ],
-          ),
-        ),
-        body: page[currentPageIndex],
+        // appBar: AppBar(
+        //   title: Row(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     children: [
+        //       Icon(Icons.restaurant_menu),
+        //       SizedBox(width: 10),
+        //       Text('Tastetrek'),
+        //     ],
+        //   ),
+        // ),
+        body: SafeArea(child: page[currentPageIndex]),
         bottomNavigationBar: BottomNavigationBar(
           onTap: onTap,
           items: const <BottomNavigationBarItem>[
