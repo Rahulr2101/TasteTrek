@@ -96,7 +96,21 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                 ),
-              ),
+              )
+            else
+              Column(children: [
+                Container(
+                  padding: EdgeInsets.fromLTRB(10, 20, 0, 0),
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
+                    "Trending now",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 20,
+                        color: Colors.black),
+                  ),
+                )
+              ]),
           ],
         ),
       ),
