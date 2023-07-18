@@ -17,8 +17,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final controllersearch = TextEditingController();
-  late List<Recipe> _recipes;
+  late List<Recipe> _recipes = [];
   bool _isLoading = true;
+  dynamic decodedResponse;
+  List<dynamic> dishNames = [];
+  List<String> rawImageUrl = [];
 
   @override
   Future<void> getRecipes(searchText) async {
@@ -27,6 +30,81 @@ class _HomePageState extends State<HomePage> {
       _isLoading = false;
     });
     print(_recipes);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchtreading();
+  }
+
+  Future<void> fetchtreading() async {
+    final url = Uri.parse(
+        'https://generativelanguage.googleapis.com/v1beta2/models/chat-bison-001:generateMessage?key=');
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({
+      "prompt": {
+        "examples": [
+          {
+            "input": {"content": "give 10 polpular dishes in json"},
+            "output": {
+              "content":
+                  "json{\n \"dishes\": [\n   \"Pizza\",\n    \"Burger\",\n     \"Sushi\",\n   \"Tacos\",\n  \"Chicken Fried Rice\",\n  \"Tikka Masala\",\n   \"Pad Thai\",\n     \"Lasagna\",\n   \"Pho\"\n]\n}\n"
+            }
+          }
+        ],
+        "messages": [
+          {"content": "give 10 polpular dishes in json  only names"}
+        ]
+      },
+      "temperature": 0,
+    });
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        dynamic jsonData = json.decode(response.body);
+        print(jsonData);
+
+        // Access the "candidates" key in the map
+        List<dynamic> candidates = jsonData["candidates"];
+
+        // Extract the content from the first element of candidates (assuming there's only one element)
+        String content = candidates[0]["content"];
+
+        // Extract the JSON array from the content string using regular expression
+        RegExp regExp = RegExp(r'```json\n\s*(\[[\s\S]*\])\s*\n```');
+        Match? match = regExp.firstMatch(content);
+        if (match != null) {
+          String jsonArrayString = match.group(1)!;
+
+          // Convert the JSON array string to a Dart List
+          dishNames = json.decode(jsonArrayString);
+
+          // Print the list of dish names
+          print(dishNames);
+        } else {
+          print("JSON array not found in the content.");
+        }
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+    final apiKey = 'gEveQ1Hcp6c9LRQ_XZAlBSEsQvYzqd5aZ5vcDWcEaPk';
+    for (int i = 0; i < dishNames.length; i++) {
+      final queryParameters = {'query': dishNames[i]};
+      final uri =
+          Uri.https('api.unsplash.com', '/search/photos', queryParameters);
+      final respon =
+          await http.get(uri, headers: {'Authorization': 'Client-ID $apiKey'});
+      Map<String, dynamic> jsonData = json.decode(respon.body);
+      List<dynamic> results = jsonData['results'];
+      rawImageUrl.add(results[0]['urls']['raw']);
+    }
+    print(rawImageUrl);
   }
 
   void navigateToRecipePage(Recipe recipe) {
@@ -41,79 +119,112 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        alignment: Alignment.bottomCenter,
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.fromLTRB(10, 20, 0, 25),
-              alignment: Alignment.bottomLeft,
-              child: Text(
-                "Find best recipes \nfor cooking",
-                style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 25),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                width: 350,
-                height: 50,
-                child: TextField(
-                  controller: controllersearch,
-                  decoration: InputDecoration(
-                    labelText: 'Search Recipes',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    getRecipes(value);
-                  },
+      body: SafeArea(
+        child: Container(
+          alignment: Alignment.bottomCenter,
+          child: Column(
+            children: [
+              Container(
+                padding: EdgeInsets.fromLTRB(10, 20, 0, 25),
+                alignment: Alignment.bottomLeft,
+                child: Text(
+                  "Find best recipes \nfor cooking",
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 25),
                 ),
               ),
-            ),
-            if (_isLoading == false)
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _recipes.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        navigateToRecipePage(_recipes[index]);
-                      },
-                      child: RecipeCard(
-                        title: _recipes[index].name,
-                        thumbnailUrl: _recipes[index].image,
-                        cal: _recipes[index].cal,
-                        place: _recipes[index].place,
-                        ingredients: _recipes[index].ingredient,
-                        ingimage: _recipes[index].ingimage,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  width: 350,
+                  height: 50,
+                  child: TextField(
+                    controller: controllersearch,
+                    decoration: InputDecoration(
+                      labelText: 'Search Recipes',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    );
-                  },
+                    ),
+                    onChanged: (value) {
+                      getRecipes(value);
+                    },
+                  ),
                 ),
-              )
-            else
-              Column(children: [
-                Container(
-                  padding: EdgeInsets.fromLTRB(10, 20, 0, 0),
-                  alignment: Alignment.bottomLeft,
-                  child: Text(
-                    "Trending now",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 20,
-                        color: Colors.black),
+              ),
+              if (_isLoading == false)
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _recipes.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          navigateToRecipePage(_recipes[index]);
+                        },
+                        child: RecipeCard(
+                          title: _recipes[index].name,
+                          thumbnailUrl: _recipes[index].image,
+                          cal: _recipes[index].cal,
+                          place: _recipes[index].place,
+                          ingredients: _recipes[index].ingredient,
+                          ingimage: _recipes[index].ingimage,
+                        ),
+                      );
+                    },
                   ),
                 )
-              ]),
-          ],
+              else
+                Column(children: [
+                  Container(
+                    padding: EdgeInsets.fromLTRB(10, 20, 0, 0),
+                    alignment: Alignment.bottomLeft,
+                    child: Text(
+                      "Trending now",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 20,
+                          color: Colors.black),
+                    ),
+                  ),
+                  SizedBox(
+                      height: 210,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.all(10),
+                        itemCount: dishNames.length,
+                        separatorBuilder: (context, index) {
+                          return const SizedBox(width: 12);
+                        },
+                        itemBuilder: (context, index) {
+                          return buildCard(index, dishNames, rawImageUrl);
+                        },
+                      ))
+                ]),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget buildCard(
+      int index, List<dynamic> dishNames, List<String> rawImageUrl) {
+    return Container(
+      width: 300,
+      height: 250,
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                Colors.black.withOpacity(0.35),
+                BlendMode.multiply,
+              ),
+              image: NetworkImage(
+                rawImageUrl[index],
+              ))),
     );
   }
 }
