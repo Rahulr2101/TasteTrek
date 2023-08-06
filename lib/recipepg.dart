@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:isolate';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -42,8 +43,11 @@ class _HomePageState extends State<HomePage> {
   Future<void> fetchDataFromApis() async {
     try {
       await fetchtreading();
-
-      rawImageUrl = await fetchImages();
+      final resultPort = ReceivePort();
+      final isolate =
+          await Isolate.spawn(isolateimg, [resultPort.sendPort, dishNames]);
+      rawImageUrl = await resultPort.first;
+      // rawImageUrl = await fetchImages();
     } catch (e) {
       print('Error fetching data from APIs: $e');
     }
@@ -100,36 +104,6 @@ class _HomePageState extends State<HomePage> {
     } catch (error) {
       print('Error: $error');
     }
-  }
-
-  Future<List<String>> fetchImages() async {
-    final apiKey = '';
-    List<String> imageUrlList = [];
-
-    for (int i = 0; i < dishNames.length; i++) {
-      final queryParameters = {
-        'query': dishNames[i],
-        'fit': 'crop',
-        'w': '640', // Width in pixels (360p width)
-        'h': '360', // Height in pixels (360p height)
-      };
-      final uri =
-          Uri.https('api.unsplash.com', '/search/photos', queryParameters);
-      final respon =
-          await http.get(uri, headers: {'Authorization': 'Client-ID $apiKey'});
-      if (respon.statusCode == 200) {
-        Map<String, dynamic> jsonData = json.decode(respon.body);
-        List<dynamic> results = jsonData['results'];
-        if (results.isNotEmpty) {
-          imageUrlList.add(results[0]['urls']['raw']);
-        }
-      } else {
-        // Handle the error when the API request fails
-        print('Error: ${respon.statusCode}');
-      }
-    }
-
-    return imageUrlList;
   }
 
   void navigateToRecipePage(Recipe recipe) {
@@ -558,4 +532,37 @@ class MyApp extends StatelessWidget {
       home: HomePage(),
     );
   }
+}
+
+Future isolateimg(List<dynamic> args) async {
+  SendPort responsePort = args[0];
+  List<dynamic> dishNames = args[1];
+  final apiKey = 'gEveQ1Hcp6c9LRQ_XZAlBSEsQvYzqd5aZ5vcDWcEaPk';
+  List<String> imageUrlList = [];
+
+  for (int i = 0; i < dishNames.length; i++) {
+    final queryParameters = {
+      'query': dishNames[i],
+      'fit': 'crop',
+      'w': '640', // Width in pixels (360p width)
+      'h': '360', // Height in pixels (360p height)
+    };
+    final uri =
+        Uri.https('api.unsplash.com', '/search/photos', queryParameters);
+    final respon =
+        await http.get(uri, headers: {'Authorization': 'Client-ID $apiKey'});
+    if (respon.statusCode == 200) {
+      Map<String, dynamic> jsonData = json.decode(respon.body);
+      List<dynamic> results = jsonData['results'];
+      if (results.isNotEmpty) {
+        imageUrlList.add(results[0]['urls']['raw']);
+      }
+    } else {
+      // Handle the error when the API request fails
+      print('Error: ${respon.statusCode}');
+    }
+  }
+  print("Img links:$imageUrlList");
+
+  Isolate.exit(responsePort, imageUrlList);
 }
