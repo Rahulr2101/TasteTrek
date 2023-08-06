@@ -207,13 +207,42 @@ class _HomePageState extends State<HomePage> {
                           separatorBuilder: (context, index) {
                             return const SizedBox(width: 12);
                           },
-                          itemBuilder: (context, index) => CachedNetworkImage(
-                              key: UniqueKey(),
-                              cacheManager: customCacheManager,
-                              imageUrl: rawImageUrl[index],
-                              height: 250,
-                              width: 300,
-                              fit: BoxFit.cover),
+                          itemBuilder: (context, index) => Stack(
+                            children: [
+                              CachedNetworkImage(
+                                  key: UniqueKey(),
+                                  cacheManager: customCacheManager,
+                                  imageUrl: rawImageUrl[index],
+                                  height: 250,
+                                  width: 300,
+                                  fit: BoxFit.cover),
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(
+                                        0.5), // Adjust the opacity as needed
+                                  ),
+                                ),
+                              ),
+                              Positioned.fill(
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      dishNames[
+                                          index], // Assuming dishNames contains the text for each image
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
