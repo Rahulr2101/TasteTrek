@@ -35,11 +35,6 @@ class _HomePageState extends State<HomePage> {
     print(_recipes);
   }
 
-  // Future<void> fetchData() async {
-  //   await fetchtreading();
-  //   rawImageUrl = await fetchImages(); // Wait for fetchImages to complete
-  // }
-
   Future<void> fetchDataFromApis() async {
     try {
       await fetchtreading();
@@ -47,7 +42,6 @@ class _HomePageState extends State<HomePage> {
       final isolate =
           await Isolate.spawn(isolateimg, [resultPort.sendPort, dishNames]);
       rawImageUrl = await resultPort.first;
-      // rawImageUrl = await fetchImages();
     } catch (e) {
       print('Error fetching data from APIs: $e');
     }
@@ -82,13 +76,10 @@ class _HomePageState extends State<HomePage> {
         dynamic jsonData = json.decode(response.body);
         print(jsonData);
 
-        // Access the "candidates" key in the map
         List<dynamic> candidates = jsonData["candidates"];
 
-        // Extract the content from the first element of candidates (assuming there's only one element)
         String content = candidates[0]["content"];
 
-        // Extract the JSON array from the content string using regular expression
         RegExp regExp = RegExp(r'```json\n\s*(\[[\s\S]*\])\s*\n```');
         Match? match = regExp.firstMatch(content);
         if (match != null) {
@@ -219,8 +210,7 @@ class _HomePageState extends State<HomePage> {
                               Positioned.fill(
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(
-                                        0.5), // Adjust the opacity as needed
+                                    color: Colors.black.withOpacity(0.5),
                                   ),
                                 ),
                               ),
@@ -229,8 +219,7 @@ class _HomePageState extends State<HomePage> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      dishNames[
-                                          index], // Assuming dishNames contains the text for each image
+                                      dishNames[index],
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 25,
@@ -466,19 +455,12 @@ class _RecipePageState extends State<RecipePage> {
                                                       ),
                                                     ),
                                                   ),
-                                                  // ElevatedButton(
-                                                  //   onPressed: () {
-                                                  //     toggleFavorite(widget.recipe);
-                                                  //   },
-                                                  //   child: Text('Save'),
-                                                  // )
                                                 ],
                                               ),
                                             );
                                           },
                                         ),
                                       ),
-                                      // Displaying the decodedResponse or loading indicator
                                       _isLoading
                                           ? CircularProgressIndicator()
                                           : decodedResponse != null &&
