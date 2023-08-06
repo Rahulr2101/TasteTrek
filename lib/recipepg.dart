@@ -37,63 +37,16 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> fetchDataFromApis() async {
     try {
-      await fetchtreading();
+      // await fetchtreading();
+      final isoreadPort = ReceivePort();
+      final isolread = await Isolate.spawn(isolateread, [isoreadPort.sendPort]);
+      dishNames = await isoreadPort.first;
       final resultPort = ReceivePort();
       final isolate =
           await Isolate.spawn(isolateimg, [resultPort.sendPort, dishNames]);
       rawImageUrl = await resultPort.first;
     } catch (e) {
       print('Error fetching data from APIs: $e');
-    }
-  }
-
-  Future<void> fetchtreading() async {
-    final url = Uri.parse(
-        'https://generativelanguage.googleapis.com/v1beta2/models/chat-bison-001:generateMessage?key=AIzaSyALPProtKMsFmPpcDXRbs8EZvjEUssPQbw');
-    final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({
-      "prompt": {
-        "examples": [
-          {
-            "input": {"content": "give 10 polpular dishes in json"},
-            "output": {
-              "content":
-                  "json{\n \"dishes\": [\n   \"Pizza\",\n    \"Burger\",\n     \"Sushi\",\n   \"Tacos\",\n  \"Chicken Fried Rice\",\n  \"Tikka Masala\",\n   \"Pad Thai\",\n     \"Lasagna\",\n   \"Pho\"\n]\n}\n"
-            }
-          }
-        ],
-        "messages": [
-          {"content": "give 10 polpular dishes in json  only names"}
-        ]
-      },
-      "temperature": 0,
-    });
-
-    try {
-      final response = await http.post(url, headers: headers, body: body);
-
-      if (response.statusCode == 200) {
-        dynamic jsonData = json.decode(response.body);
-        print(jsonData);
-
-        List<dynamic> candidates = jsonData["candidates"];
-
-        String content = candidates[0]["content"];
-
-        RegExp regExp = RegExp(r'```json\n\s*(\[[\s\S]*\])\s*\n```');
-        Match? match = regExp.firstMatch(content);
-        if (match != null) {
-          String jsonArrayString = match.group(1)!;
-          dishNames = json.decode(jsonArrayString);
-          print(dishNames);
-        } else {
-          print("JSON array not found in the content.");
-        }
-      } else {
-        print('Error: ${response.statusCode}');
-      }
-    } catch (error) {
-      print('Error: $error');
     }
   }
 
@@ -548,15 +501,15 @@ class MyApp extends StatelessWidget {
 Future isolateimg(List<dynamic> args) async {
   SendPort responsePort = args[0];
   List<dynamic> dishNames = args[1];
-  final apiKey = 'gEveQ1Hcp6c9LRQ_XZAlBSEsQvYzqd5aZ5vcDWcEaPk';
+  final apiKey = '';
   List<String> imageUrlList = [];
 
   for (int i = 0; i < dishNames.length; i++) {
     final queryParameters = {
       'query': dishNames[i],
       'fit': 'crop',
-      'w': '640', // Width in pixels (360p width)
-      'h': '360', // Height in pixels (360p height)
+      'w': '640',
+      'h': '360',
     };
     final uri =
         Uri.https('api.unsplash.com', '/search/photos', queryParameters);
@@ -576,4 +529,57 @@ Future isolateimg(List<dynamic> args) async {
   print("Img links:$imageUrlList");
 
   Isolate.exit(responsePort, imageUrlList);
+}
+
+Future isolateread(List<dynamic> args) async {
+  SendPort responsePort = args[0];
+  List<dynamic> dishNames = [];
+  final url = Uri.parse(
+      'https://generativelanguage.googleapis.com/v1beta2/models/chat-bison-001:generateMessage?key=');
+  final headers = {'Content-Type': 'application/json'};
+  final body = jsonEncode({
+    "prompt": {
+      "examples": [
+        {
+          "input": {"content": "give 10 polpular dishes in json"},
+          "output": {
+            "content":
+                "json{\n \"dishes\": [\n   \"Pizza\",\n    \"Burger\",\n     \"Sushi\",\n   \"Tacos\",\n  \"Chicken Fried Rice\",\n  \"Tikka Masala\",\n   \"Pad Thai\",\n     \"Lasagna\",\n   \"Pho\"\n]\n}\n"
+          }
+        }
+      ],
+      "messages": [
+        {"content": "give 10 polpular dishes in json  only names"}
+      ]
+    },
+    "temperature": 0,
+  });
+
+  try {
+    final response = await http.post(url, headers: headers, body: body);
+
+    if (response.statusCode == 200) {
+      dynamic jsonData = json.decode(response.body);
+      print(jsonData);
+
+      List<dynamic> candidates = jsonData["candidates"];
+
+      String content = candidates[0]["content"];
+
+      RegExp regExp = RegExp(r'```json\n\s*(\[[\s\S]*\])\s*\n```');
+      Match? match = regExp.firstMatch(content);
+      if (match != null) {
+        String jsonArrayString = match.group(1)!;
+        dishNames = json.decode(jsonArrayString);
+        print(dishNames);
+      } else {
+        print("JSON array not found in the content.");
+      }
+    } else {
+      print('Error: ${response.statusCode}');
+    }
+  } catch (error) {
+    print('Error: $error');
+  }
+  Isolate.exit(responsePort, dishNames);
 }
