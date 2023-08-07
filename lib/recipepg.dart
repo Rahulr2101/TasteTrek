@@ -45,6 +45,7 @@ class _HomePageState extends State<HomePage> {
       final isolate =
           await Isolate.spawn(isolateimg, [resultPort.sendPort, dishNames]);
       rawImageUrl = await resultPort.first;
+      isolatepopu();
     } catch (e) {
       print('Error fetching data from APIs: $e');
     }
@@ -188,6 +189,15 @@ class _HomePageState extends State<HomePage> {
                         ),
                       );
                     },
+                  ),
+                  Container(
+                    child: Text(
+                      "Today's Special",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 20,
+                          color: Colors.black),
+                    ),
                   )
                 ]),
             ],
@@ -522,7 +532,6 @@ Future isolateimg(List<dynamic> args) async {
         imageUrlList.add(results[0]['urls']['raw']);
       }
     } else {
-      // Handle the error when the API request fails
       print('Error: ${respon.statusCode}');
     }
   }
@@ -582,4 +591,76 @@ Future isolateread(List<dynamic> args) async {
     print('Error: $error');
   }
   Isolate.exit(responsePort, dishNames);
+}
+
+Future isolatepopu() async {
+  // SendPort responsePort = args[0];
+  // List<dynamic> dishNames = [];
+  final url = Uri.parse(
+      'https://generativelanguage.googleapis.com/v1beta2/models/chat-bison-001:generateMessage?key=');
+  final headers = {'Content-Type': 'application/json'};
+  final body = jsonEncode({
+    "prompt": {
+      "examples": [
+        {
+          "input": {
+            "content": "Give only One random name of the a dish in json"
+          },
+          "output": {"content": "json{\n \"dishes\": [\n   \"Pizza\"]\n}\n"}
+        },
+        {
+          "input": {
+            "content": "Give only One random name of the a dish in json"
+          },
+          "output": {"content": "json{\n \"dishes\": [\n   \"Dosa\"]\n}\n"}
+        },
+        {
+          "input": {
+            "content": "Give only One random name of the a dish in json"
+          },
+          "output": {"content": "json{\n \"dishes\": [\n  \"Pav Bhaji\"]\n}\n"}
+        },
+        {
+          "input": {
+            "content": "Give only one random name of the a dish in json"
+          },
+          "output": {
+            "content": "json{\n \"dishes\": [\n   \"Butter Naan\"]\n}\n"
+          }
+        }
+      ],
+      "messages": [
+        {"content": "Give only One random name of the a dish in json"}
+      ]
+    },
+    "temperature": 0,
+  });
+
+  try {
+    final response = await http.post(url, headers: headers, body: body);
+
+    if (response.statusCode == 200) {
+      dynamic jsonData = json.decode(response.body);
+      print("Answer:$jsonData");
+
+      // List<dynamic> candidates = jsonData["candidates"];
+
+      // String content = candidates[0]["content"];
+
+      // RegExp regExp = RegExp(r'```json\n\s*(\[[\s\S]*\])\s*\n```');
+      // Match? match = regExp.firstMatch(content);
+      // if (match != null) {
+      //   String jsonArrayString = match.group(1)!;
+      //   dishNames = json.decode(jsonArrayString);
+      //   print(dishNames);
+      // } else {
+      //   print("JSON array not found in the content.");
+      // }
+    } else {
+      print('Error: ${response.statusCode}');
+    }
+  } catch (error) {
+    print('Error: $error');
+  }
+  // Isolate.exit(responsePort, dishNames);
 }
