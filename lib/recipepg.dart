@@ -25,6 +25,8 @@ class _HomePageState extends State<HomePage> {
   dynamic decodedResponse;
   List<dynamic> dishNames = [];
   List<String> rawImageUrl = [];
+  bool imageload = false;
+  String Dishdis = '';
 
   @override
   Future<void> getRecipes(searchText) async {
@@ -36,18 +38,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> fetchDataFromApis() async {
-    try {
-      // await fetchtreading();
-      final isoreadPort = ReceivePort();
-      final isolread = await Isolate.spawn(isolateread, [isoreadPort.sendPort]);
-      dishNames = await isoreadPort.first;
-      final resultPort = ReceivePort();
-      final isolate =
-          await Isolate.spawn(isolateimg, [resultPort.sendPort, dishNames]);
-      rawImageUrl = await resultPort.first;
-      isolatepopu();
-    } catch (e) {
-      print('Error fetching data from APIs: $e');
+    if (!imageload) {
+      try {
+        // await fetchtreading();
+        final isoreadPort = ReceivePort();
+        final isolread =
+            await Isolate.spawn(isolateread, [isoreadPort.sendPort]);
+        dishNames = await isoreadPort.first;
+        final resultPort = ReceivePort();
+        final isolate =
+            await Isolate.spawn(isolateimg, [resultPort.sendPort, dishNames]);
+        rawImageUrl = await resultPort.first;
+        imageload = true;
+        Dishdis = await isolatepopu();
+        print("dish dis:$Dishdis");
+      } catch (e) {
+        print('Error fetching data from APIs: $e');
+      }
     }
   }
 
@@ -70,137 +77,199 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Container(
-          alignment: Alignment.bottomCenter,
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(10, 20, 0, 25),
-                alignment: Alignment.bottomLeft,
-                child: Text(
-                  "Find best recipes \nfor cooking",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 25),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SizedBox(
-                  width: 350,
-                  height: 50,
-                  child: TextField(
-                    controller: controllersearch,
-                    decoration: InputDecoration(
-                      labelText: 'Search Recipes',
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    onChanged: (value) {
-                      getRecipes(value);
-                    },
-                  ),
-                ),
-              ),
-              if (_isLoading == false)
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _recipes.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          navigateToRecipePage(_recipes[index]);
-                        },
-                        child: RecipeCard(
-                          title: _recipes[index].name,
-                          thumbnailUrl: _recipes[index].image,
-                          cal: _recipes[index].cal,
-                          place: _recipes[index].place,
-                          ingredients: _recipes[index].ingredient,
-                          ingimage: _recipes[index].ingimage,
-                        ),
-                      );
-                    },
-                  ),
-                )
-              else
-                Column(children: [
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Column(
+                children: [
                   Container(
-                    padding: EdgeInsets.fromLTRB(10, 20, 0, 0),
+                    padding: EdgeInsets.fromLTRB(10, 20, 0, 25),
                     alignment: Alignment.bottomLeft,
                     child: Text(
-                      "Trending now",
+                      "Find best recipes \nfor cooking",
                       style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 20,
-                          color: Colors.black),
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 25),
                     ),
                   ),
-                  FutureBuilder<void>(
-                    future: fetchDataFromApis(),
-                    builder: (context, snapshot) {
-                      // Images are loaded successfully
-                      return SizedBox(
-                        height: 210,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.all(10),
-                          itemCount: dishNames.length,
-                          separatorBuilder: (context, index) {
-                            return const SizedBox(width: 12);
-                          },
-                          itemBuilder: (context, index) => Stack(
-                            children: [
-                              CachedNetworkImage(
-                                  key: UniqueKey(),
-                                  cacheManager: customCacheManager,
-                                  imageUrl: rawImageUrl[index],
-                                  height: 250,
-                                  width: 300,
-                                  fit: BoxFit.cover),
-                              Positioned.fill(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.5),
-                                  ),
-                                ),
-                              ),
-                              Positioned.fill(
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      dishNames[index],
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      width: 350,
+                      height: 50,
+                      child: TextField(
+                        controller: controllersearch,
+                        decoration: InputDecoration(
+                          labelText: 'Search Recipes',
+                          prefixIcon: Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                      );
-                    },
-                  ),
-                  Container(
-                    child: Text(
-                      "Today's Special",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 20,
-                          color: Colors.black),
+                        onChanged: (value) {
+                          getRecipes(value);
+                        },
+                      ),
                     ),
-                  )
-                ]),
-            ],
+                  ),
+                  if (_isLoading == false)
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _recipes.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () {
+                              navigateToRecipePage(_recipes[index]);
+                            },
+                            child: RecipeCard(
+                              title: _recipes[index].name,
+                              thumbnailUrl: _recipes[index].image,
+                              cal: _recipes[index].cal,
+                              place: _recipes[index].place,
+                              ingredients: _recipes[index].ingredient,
+                              ingimage: _recipes[index].ingimage,
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  else
+                    Column(children: [
+                      Container(
+                        padding: EdgeInsets.fromLTRB(10, 20, 0, 0),
+                        alignment: Alignment.bottomLeft,
+                        child: Text(
+                          "Trending now",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 20,
+                              color: Colors.black),
+                        ),
+                      ),
+                      FutureBuilder<void>(
+                        future: fetchDataFromApis(),
+                        builder: (context, snapshot) {
+                          // Images are loaded successfully
+                          return SizedBox(
+                            height: 210,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              padding: const EdgeInsets.all(10),
+                              itemCount: dishNames.length,
+                              separatorBuilder: (context, index) {
+                                return const SizedBox(width: 12);
+                              },
+                              itemBuilder: (context, index) => Stack(
+                                children: [
+                                  CachedNetworkImage(
+                                      key: UniqueKey(),
+                                      cacheManager: customCacheManager,
+                                      imageUrl: rawImageUrl[index],
+                                      height: 250,
+                                      width: 300,
+                                      fit: BoxFit.cover),
+                                  Positioned.fill(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.5),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned.fill(
+                                    child: Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          dishNames[index],
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      Container(
+                        child: Column(
+                          children: [
+                            Container(
+                              child: Text(
+                                "Today's Special",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 20,
+                                    color: Colors.black),
+                              ),
+                            ),
+                            FutureBuilder<void>(
+                              future: fetchDataFromApis(),
+                              builder: (context, snapshot) {
+                                // Images are loaded successfully
+                                return Column(children: [
+                                  if (imageload)
+                                    Column(
+                                      children: [
+                                        SizedBox(
+                                          height: 210,
+                                          child: CachedNetworkImage(
+                                              key: UniqueKey(),
+                                              cacheManager: customCacheManager,
+                                              imageUrl: rawImageUrl[2],
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.9,
+                                              width: 300,
+                                              fit: BoxFit.cover),
+                                        ),
+                                        Container(
+                                            decoration: BoxDecoration(
+                                              color: Color.fromARGB(
+                                                  255, 249, 242, 242),
+                                              borderRadius: BorderRadius.only(
+                                                  bottomLeft:
+                                                      Radius.circular(10),
+                                                  bottomRight:
+                                                      Radius.circular(10)),
+                                            ),
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.25,
+                                            width: 300,
+                                            child: Text(
+                                              Dishdis,
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 15),
+                                            ))
+                                      ],
+                                    )
+                                  else
+                                    Container(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                ]);
+                              },
+                            )
+                          ],
+                        ),
+                      )
+                    ]),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -229,7 +298,7 @@ class _RecipePageState extends State<RecipePage> {
 
   Future<void> fetchData() async {
     final url = Uri.parse(
-        'https://generativelanguage.googleapis.com/v1beta2/models/chat-bison-001:generateMessage?key=AIzaSyALPProtKMsFmPpcDXRbs8EZvjEUssPQbw');
+        'https://generativelanguage.googleapis.com/v1beta2/models/chat-bison-001:generateMessage?key=');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       "prompt": {
@@ -593,9 +662,10 @@ Future isolateread(List<dynamic> args) async {
   Isolate.exit(responsePort, dishNames);
 }
 
-Future isolatepopu() async {
+Future<String> isolatepopu() async {
   // SendPort responsePort = args[0];
   // List<dynamic> dishNames = [];
+  String Dishdes = '';
   final url = Uri.parse(
       'https://generativelanguage.googleapis.com/v1beta2/models/chat-bison-001:generateMessage?key=');
   final headers = {'Content-Type': 'application/json'};
@@ -603,37 +673,15 @@ Future isolatepopu() async {
     "prompt": {
       "examples": [
         {
-          "input": {
-            "content": "Give only One random name of the a dish in json"
-          },
-          "output": {"content": "json{\n \"dishes\": [\n   \"Pizza\"]\n}\n"}
-        },
-        {
-          "input": {
-            "content": "Give only One random name of the a dish in json"
-          },
-          "output": {"content": "json{\n \"dishes\": [\n   \"Dosa\"]\n}\n"}
-        },
-        {
-          "input": {
-            "content": "Give only One random name of the a dish in json"
-          },
-          "output": {"content": "json{\n \"dishes\": [\n  \"Pav Bhaji\"]\n}\n"}
-        },
-        {
-          "input": {
-            "content": "Give only one random name of the a dish in json"
-          },
-          "output": {
-            "content": "json{\n \"dishes\": [\n   \"Butter Naan\"]\n}\n"
-          }
+          "input": {"content": "list"},
+          "output": {"content": "json{dishes: []}\n"}
         }
       ],
       "messages": [
-        {"content": "Give only One random name of the a dish in json"}
+        {"content": "Sushi in 30 words"}
       ]
     },
-    "temperature": 0,
+    "temperature": 0.2,
   });
 
   try {
@@ -641,26 +689,18 @@ Future isolatepopu() async {
 
     if (response.statusCode == 200) {
       dynamic jsonData = json.decode(response.body);
-      print("Answer:$jsonData");
 
-      // List<dynamic> candidates = jsonData["candidates"];
+      List<dynamic> candidates = jsonData["candidates"];
 
-      // String content = candidates[0]["content"];
-
-      // RegExp regExp = RegExp(r'```json\n\s*(\[[\s\S]*\])\s*\n```');
-      // Match? match = regExp.firstMatch(content);
-      // if (match != null) {
-      //   String jsonArrayString = match.group(1)!;
-      //   dishNames = json.decode(jsonArrayString);
-      //   print(dishNames);
-      // } else {
-      //   print("JSON array not found in the content.");
-      // }
+      String content = candidates[0]["content"];
+      print("$content");
+      Dishdes = content;
     } else {
       print('Error: ${response.statusCode}');
     }
   } catch (error) {
     print('Error: $error');
   }
+  return Dishdes;
   // Isolate.exit(responsePort, dishNames);
 }
