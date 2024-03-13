@@ -1,11 +1,10 @@
 # TasteTrek - Recipe Suggestion App
 
-TasteTrek is a recipe suggestion app designed to make meal planning easier and healthier. By considering the user's food preferences, TasteTrek recommends a variety of delicious recipes that align with their tastes. Each recipe comes with an approximate calorie content, allowing users to make informed decisions about their meals. With TasteTrek, users can explore a wide range of culinary options while ensuring their nutritional needs are met. Start your flavor-filled journey towards a healthier lifestyle with TasteTrek!
-
-## Key Features
-- Personalized recipe suggestions based on food preferences
-- Approximate calorie information for each recipe
-- Easy-to-use interface for seamless navigation
-- Ability to save favorite recipes for future reference
-- Search functionality to find specific recipes
-- Regular updates with new recipes and features
+TasteTrek is a mobile application designed to assist individuals with food allergies by analyzing food images and identifying ingredients. The app leverages various APIs and machine learning models to provide accurate information about the food you consume.
+# ScreenShot
+<img src="https://github.com/Rahulr2101/TasteTrek/screenshots/Screenshot1.png" width="200" height="400">
+# Features
+- Photo Analysis: Take a photo of your food to analyze its ingredients.
+- Ingredient Prediction: Utilizes TensorFlow Lite for food ingredient predictions.
+- Food Information: Integrates the Edamam API to fetch detailed information about food items and their nutritional value.
+- Google PaLM API: Generates custom recipes based on user input.
