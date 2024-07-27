@@ -2,7 +2,7 @@
 
 TasteTrek is a mobile application designed to assist individuals with food allergies by analyzing food images and identifying ingredients. The app leverages various APIs and machine learning models to provide accurate information about the food you consume.
 # ScreenShot
-<img src="https://github.com/Rahulr2101/TasteTrek/screenshots/Screenshot1.png" width="200" height="400">
+<img src="https://github.com/Rahulr2101/TasteTrek/blob/main/screenshots/Screenshot1.png" width="200" height="400">
 # Features
 - Photo Analysis: Take a photo of your food to analyze its ingredients.
 - Ingredient Prediction: Utilizes TensorFlow Lite for food ingredient predictions.
