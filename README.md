@@ -10,3 +10,6 @@ TasteTrek is a mobile application designed to assist individuals with food aller
 - **Ingredient Prediction:** Utilizes TensorFlow Lite for food ingredient predictions.
 - **Food Information:** Integrates the Edamam API to fetch detailed information about food items and their nutritional value.
 - **Google PaLM API:** Generates custom recipes based on user input.
+  
+# Dataset
+- Kaggle - https://www.kaggle.com/datasets/l33tc0d3r/indian-food-classification?resource=download-directory
